@@ -5,7 +5,7 @@ export type Difficulty='easy'|'medium'|'hard';
 export const difficultyLabel:Record<Difficulty,string>={easy:'易・静止画',medium:'中・アニメ',hard:'難・全身アニメ'};
 export type Clan='ロマ子';
 export const clanFaceNames:Record<Clan,string[]>={
- 'ロマ子':['アニメスクリーンキャップ','3D','トラディショナル＋ラインアート','1999年スタイル','ピクセルアート','カートゥーン'],
+ 'ロマ子':['アニメスクリーンキャップ','3D','トラディショナル＋ラインアート','1990年代アニメ調','ピクセルアート','カートゥーン'],
 };
 export const clanRoman:Record<Clan,string>={ロマ子:'ROMACO'};
 export type Active={move:Move;started:number;undo:boolean};

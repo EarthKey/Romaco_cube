@@ -7,9 +7,16 @@ import {celebrationAt} from './celebration';
 import {stickersFor,faces,transform,solvedFaces,type Move,type Axis,type Vec} from './model';
 
 type FaceMedia={image:string;video?:string;flipX?:boolean;once?:boolean};
-// Art is intentionally absent until the six Romaco styles are approved.
+// Approved still images for the easy level and entry preview.
 // Stage 1 uses a still image, stage 2 may add a video, and stage 3 may replace both.
-const romacoFaceMedia:Partial<Record<number,FaceMedia&{hard?:FaceMedia}>>={};
+const romacoFaceMedia:Partial<Record<number,FaceMedia&{hard?:FaceMedia}>>={
+ 0:{image:'/romaco/easy/face-1.png'},
+ 1:{image:'/romaco/easy/face-2.png'},
+ 2:{image:'/romaco/easy/face-3.png'},
+ 3:{image:'/romaco/easy/face-4.png'},
+ 4:{image:'/romaco/easy/face-5.png'},
+ 5:{image:'/romaco/easy/face-6.png'},
+};
 
 export function Scene({preview=false}:{preview?:boolean}){
  const host=useRef<HTMLDivElement>(null);
@@ -54,7 +61,7 @@ export function Scene({preview=false}:{preview?:boolean}){
  const touchCornerCoreMat=new T.PointsMaterial({color:'#16845b',size:.11,transparent:true,opacity:.7,depthWrite:false});
  const touchCorners=new T.Points(touchCornerGeo,touchCornerMat),touchCornerCores=new T.Points(touchCornerGeo,touchCornerCoreMat);root.add(touchCorners,touchCornerCores);
  const clan=preview?'ロマ子':useGame.getState().clan;
- const faceMedia=romacoFaceMedia;
+ const faceMedia=preview||useGame.getState().difficulty==='easy'?romacoFaceMedia:{};
  const difficulty=preview?'easy':useGame.getState().difficulty;const animateFaces=difficulty!=='easy';
  const textures:T.Texture[]=[];const videos:HTMLVideoElement[]=[];
  const materials:T.MeshBasicMaterial[]=[];const meshes:T.Mesh[]=[];
