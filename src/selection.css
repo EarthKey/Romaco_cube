@@ -1,0 +1,12 @@
+/* Direction cues stay in the stage margins, leaving the portrait unobstructed. */
+.turn-guide{position:absolute;inset:0;z-index:3;pointer-events:none}
+.turn-cue{--ink:#b91e40;--light:#ff5c7a;position:absolute;pointer-events:auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;width:60px;min-height:58px;padding:6px;border:1px solid var(--light);border-radius:18px;background:#fffaf4f5;color:var(--ink);box-shadow:0 0 0 4px #fff8,0 0 22px color-mix(in srgb,var(--light) 35%,transparent);animation:cue-breathe 2.6s ease-in-out infinite}
+.turn-cue:hover:not(:disabled),.turn-cue:focus-visible{background:white;box-shadow:0 0 0 5px #fff9,0 0 30px color-mix(in srgb,var(--light) 60%,transparent);outline:2px solid var(--ink);outline-offset:3px}
+.turn-cue:disabled{opacity:.45;animation:none}.cue-arrow{font-size:29px;line-height:29px;font-family:Georgia,serif}.cue-key{font-size:10px;font-weight:700;letter-spacing:1px}.cue-key span{font-size:9px;letter-spacing:0;font-weight:400}
+.cue-w{top:48px;left:calc(50% - 30px)}.cue-s{bottom:56px;left:calc(50% - 30px)}.cue-a,.cue-d{--ink:#087148;--light:#28cc8d;top:calc(50% - 29px)}.cue-a{left:18px}.cue-d{right:18px}
+.guide-caption{position:absolute;bottom:35px;left:0;right:0;text-align:center;font-size:10px;letter-spacing:2px;color:#806445}
+.dpad .w,.dpad .s{color:#b91e40;border-color:#ed8396;background:#fff0f2}.dpad .a,.dpad .d{color:#087148;border-color:#63cda3;background:#ecfff5}.dpad small{color:inherit}
+@keyframes cue-breathe{50%{box-shadow:0 0 0 5px #fff7,0 0 27px color-mix(in srgb,var(--light) 48%,transparent)}}
+.motion-off .turn-cue{animation:none}
+@media(max-width:440px){.cue-w,.cue-s{left:calc(50% - 30px)}.cue-w{top:42px}.cue-s{bottom:51px}.cue-a{left:10px}.cue-d{right:10px}.cue-key span{display:none}}
+@media(prefers-reduced-motion:reduce){.turn-cue{animation:none}}

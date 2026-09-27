@@ -1,0 +1,4 @@
+/* Separate canvas and controls: cube pixels cannot enter the button lanes. */
+.stage .scene{inset:120px 92px 138px}
+@media(max-width:760px){.stage{height:540px}.stage .scene{inset:120px 92px 138px}}
+@media(max-width:440px){.stage{height:520px}.stage .scene{inset:110px 76px 128px}}

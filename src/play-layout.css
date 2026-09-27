@@ -1,0 +1,23 @@
+:root{--paper:#f6f1e9;--text:#453a3a;--sakura:#a66469;--vertical:#b91e40;--horizontal:#087148}
+main{max-width:1200px;padding:22px 36px;font-family:"Yu Gothic",Meiryo,sans-serif}header{padding-bottom:16px}.badge{font-size:10px}.intro{padding:22px 0}.eyebrow{display:none}.intro h1{font-size:42px;margin:0 0 8px;letter-spacing:-1px}.intro p{font-size:13px;color:var(--text);margin:0}
+.play-area{grid-template-columns:minmax(0,1.8fr) minmax(280px,1fr);gap:28px}.stage{min-height:560px}.stage-label{top:22px;left:22px}.stage-label span{display:block;margin:4px 0 0;font-size:9px}.play-stats{position:absolute;right:22px;top:22px;display:flex;gap:18px;align-items:center;color:var(--text);font-size:12px}.play-stats span{display:flex;align-items:center;gap:8px}.play-stats strong{font-family:Georgia,serif;font-size:25px;font-weight:400}.play-stats small{font:11px "Yu Gothic",sans-serif}.stage-bottom{justify-content:center;font-size:12px;letter-spacing:0;color:var(--text);bottom:18px}.guide-caption{color:var(--text);font-size:12px;letter-spacing:1px}
+aside{padding:18px 0}.chapter{font-size:11px;color:var(--sakura)}.notice{font-size:13px;min-height:44px;margin:15px 0 10px;line-height:1.7}.mix button,.actions button{min-height:44px;font-size:13px}.actions{margin:8px 0 22px}.help,details{font-size:13px;color:var(--text);margin-top:0;border-top:1px solid #d9cdc3}summary{padding:15px 0;min-height:44px}.help-body{padding:0 0 8px}.help-body p,details p{font-size:13px;line-height:1.85}.help-body h3{font-size:13px}details label{font-size:12px;margin:12px 0}details button{font-size:12px;min-height:44px}details input[type=range]{min-width:0;width:140px}.portrait-link{font-size:13px;padding:16px 0;margin-bottom:12px;color:var(--text)}.diagnostics{font-size:12px}.diagnostics p{font-size:12px}.diagnostics span{display:block;margin-bottom:15px}footer{font-size:11px;line-height:1.6;color:var(--text);padding:20px 0}.turn-cue{min-width:44px;min-height:48px}
+@media(max-width:760px){main{padding:14px 16px}header{padding-bottom:12px}.brand{font-size:10px}.badge{font-size:9px;letter-spacing:0}.intro{padding:15px 0}.intro h1{font-size:31px}.intro p{font-size:12px}.play-area{grid-template-columns:1fr;gap:0}.stage{height:480px;min-height:0}.stage .scene{inset:120px 92px 138px}aside{padding:0 4px}.chapter{display:none}.notice{margin:12px 0 8px;min-height:36px;padding:0}.actions{margin-bottom:15px}.play-stats{right:16px;top:19px;gap:14px}.stage-label{left:17px;top:19px;font-size:16px}footer{gap:4px;padding-top:16px}}
+@media(max-width:440px){.stage{height:460px}.stage .scene{inset:110px 70px 128px}.play-stats{gap:10px;font-size:11px}.play-stats strong{font-size:23px}.stage-label{letter-spacing:3px}.intro h1{font-size:29px}.play-stats span{gap:5px}.cue-a{left:10px}.cue-d{right:10px}}
+
+.rotation-surface{position:absolute;inset:2.5%;z-index:2;touch-action:none}
+.stage-label,.stage-bottom{z-index:3;pointer-events:none}
+.play-stats{z-index:4;display:grid;grid-template-columns:auto auto;pointer-events:none}
+.stage-undo{grid-column:2;justify-self:end;pointer-events:auto}
+.stage-undo button{min-height:44px;font-size:12px;padding:8px 12px}
+.stage-bottom{flex-direction:column;text-align:center;gap:4px;line-height:1.5}
+.swipe-hint{font-size:11px}
+.stage .cue-w{top:92px}.stage .cue-s{bottom:100px}.stage .guide-caption{bottom:78px}
+
+/* Reserve the rightmost fifth for page scrolling on touch devices. */
+@media (pointer:coarse){.rotation-surface{right:20%}.stage .scene canvas{pointer-events:none;touch-action:pan-y}}
+
+
+/* Add 20% vertical room on phones without enlarging the cube canvas. */
+@media(max-width:760px){.stage .scene{inset:174px 92px 192px}.stage .cue-w{top:104px}.stage .cue-s{bottom:92px}}
+@media(max-width:440px){.stage .scene{inset:162px 70px 180px}}
