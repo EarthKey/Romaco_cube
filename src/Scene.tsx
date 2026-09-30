@@ -7,15 +7,15 @@ import {celebrationAt} from './celebration';
 import {stickersFor,faces,transform,solvedFaces,type Move,type Axis,type Vec} from './model';
 
 type FaceMedia={image:string;video?:string;flipX?:boolean;once?:boolean};
-// Approved still images for the easy level and entry preview.
-// Stage 1 uses a still image, stage 2 may add a video, and stage 3 may replace both.
+// The approved stills remain the preview/easy images and fallback for medium videos.
+// Hard mode keeps its placeholder tiles until separate assets are approved.
 const romacoFaceMedia:Partial<Record<number,FaceMedia&{hard?:FaceMedia}>>={
- 0:{image:'/romaco/easy/face-1.png'},
- 1:{image:'/romaco/easy/face-2.png'},
- 2:{image:'/romaco/easy/face-3.png'},
- 3:{image:'/romaco/easy/face-4.png'},
- 4:{image:'/romaco/easy/face-5.png'},
- 5:{image:'/romaco/easy/face-6.png'},
+ 0:{image:'/romaco/easy/face-1.png',video:'/romaco/medium/face-1.mp4'},
+ 1:{image:'/romaco/easy/face-2.png',video:'/romaco/medium/face-2.mp4'},
+ 2:{image:'/romaco/easy/face-3.png',video:'/romaco/medium/face-3.mp4'},
+ 3:{image:'/romaco/easy/face-4.png',video:'/romaco/medium/face-4.mp4'},
+ 4:{image:'/romaco/easy/face-5.png',video:'/romaco/medium/face-5.mp4'},
+ 5:{image:'/romaco/easy/face-6.png',video:'/romaco/medium/face-6.mp4'},
 };
 
 export function Scene({preview=false}:{preview?:boolean}){
@@ -61,9 +61,9 @@ export function Scene({preview=false}:{preview?:boolean}){
  const touchCornerCoreMat=new T.PointsMaterial({color:'#16845b',size:.11,transparent:true,opacity:.7,depthWrite:false});
  const touchCorners=new T.Points(touchCornerGeo,touchCornerMat),touchCornerCores=new T.Points(touchCornerGeo,touchCornerCoreMat);root.add(touchCorners,touchCornerCores);
  const clan=preview?'ロマ子':useGame.getState().clan;
- const faceMedia=preview||useGame.getState().difficulty==='easy'?romacoFaceMedia:{};
- const difficulty=preview?'easy':useGame.getState().difficulty;const animateFaces=difficulty!=='easy';
- const textures:T.Texture[]=[];const videos:HTMLVideoElement[]=[];
+ const difficulty=preview?'easy':useGame.getState().difficulty;
+ const faceMedia=difficulty==='hard'?{}:romacoFaceMedia;const animateFaces=difficulty==='medium';
+ const textures:T.Texture[]=[];const videos:HTMLVideoElement[]=[];const refreshMedia:(()=>void)[]=[];
  const materials:T.MeshBasicMaterial[]=[];const meshes:T.Mesh[]=[];
  const lists=faces.map((_,i)=>tiles.filter(s=>s.face===i));
  faces.forEach((f,i)=>{
@@ -76,11 +76,13 @@ export function Scene({preview=false}:{preview?:boolean}){
  const fallback=new T.CanvasTexture(c);fallback.colorSpace=T.SRGBColorSpace;textures.push(fallback);
  const mat=new T.MeshBasicMaterial({map:fallback});materials.push(mat);
  const base=faceMedia[i],media=base&&difficulty==='hard'&&base.hard?base.hard:base;let videoReady=false;
- if(media)new T.TextureLoader().load(media.image,tex=>{if(disposed){tex.dispose();return;}tex.colorSpace=T.SRGBColorSpace;tex.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());textures.push(tex);if(!videoReady){mat.map=tex;mat.needsUpdate=true;}},undefined,()=>useGame.setState({notice:`${clanFaceNames[clan][i]}の画像を読み込めません。${media.image} を確認してください。`}));
+ let imageTexture:T.Texture|null=null,videoTexture:T.VideoTexture|null=null;
+ const updateMedia=()=>{const tex=videoReady&&!useGame.getState().reduced?videoTexture:imageTexture;if(tex&&mat.map!==tex){mat.map=tex;mat.needsUpdate=true;}};refreshMedia.push(updateMedia);
+ if(media)new T.TextureLoader().load(media.image,tex=>{if(disposed){tex.dispose();return;}tex.colorSpace=T.SRGBColorSpace;tex.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());textures.push(tex);imageTexture=tex;updateMedia();},undefined,()=>useGame.setState({notice:`${clanFaceNames[clan][i]}の画像を読み込めません。${media.image} を確認してください。`}));
  if(media?.video&&animateFaces){
   const video=document.createElement('video');videos.push(video);video.className='face-video-source';video.hidden=true;video.setAttribute('aria-hidden','true');video.src=media.video;video.muted=true;video.loop=!media.once;video.playsInline=true;video.preload='auto';video.disablePictureInPicture=true;el.appendChild(video);
-  video.onloadeddata=()=>{if(disposed)return;videoReady=true;const tex=new T.VideoTexture(video);tex.colorSpace=T.SRGBColorSpace;tex.minFilter=T.LinearFilter;tex.magFilter=T.LinearFilter;textures.push(tex);mat.map=tex;mat.needsUpdate=true;if(!useGame.getState().reduced)void video.play().catch(()=>{});};
-  video.onerror=()=>useGame.setState({notice:`${clanFaceNames[clan][i]}のアニメを読み込めません。静止画で表示します。${media.video} を確認してください。`});video.load();
+  video.onloadeddata=()=>{if(disposed)return;videoReady=true;const tex=new T.VideoTexture(video);tex.colorSpace=T.SRGBColorSpace;tex.minFilter=T.LinearFilter;tex.magFilter=T.LinearFilter;textures.push(tex);videoTexture=tex;updateMedia();if(!useGame.getState().reduced)void video.play().catch(()=>{});};
+  video.onerror=()=>{videoReady=false;updateMedia();useGame.setState({notice:`${clanFaceNames[clan][i]}のアニメを読み込めません。静止画で表示します。${media.video} を確認してください。`});};video.load();
  }
  const geo=new T.BufferGeometry();geo.setAttribute('position',new T.BufferAttribute(new Float32Array(perFace*12),3));
  const uv:number[]=[],ix:number[]=[];
@@ -158,7 +160,7 @@ export function Scene({preview=false}:{preview?:boolean}){
  frame=requestAnimationFrame(tick);const dt=Math.min((now-previous)/1000,.04);previous=now;
  const state=useGame.getState();
  const videoEnabled=!state.reduced&&document.visibilityState==='visible';
- if(videoEnabled!==lastVideoEnabled){lastVideoEnabled=videoEnabled;videos.forEach(video=>{if(videoEnabled&&video.readyState>=2&&!video.ended)void video.play().catch(()=>{});else video.pause();});}
+ if(videoEnabled!==lastVideoEnabled){lastVideoEnabled=videoEnabled;refreshMedia.forEach(refresh=>refresh());videos.forEach(video=>{if(videoEnabled&&video.readyState>=2&&!video.ended)void video.play().catch(()=>{});else video.pause();});}
  if(videoEnabled&&now>=nextVideoRetry){nextVideoRetry=now+1000;videos.forEach(video=>{if(video.paused&&video.readyState>=2&&!video.ended)void video.play().catch(()=>{});});}
  if(state.resetView!==lastReset){lastReset=state.resetView;initial();cancel();controls=null;state.select(null);}
  if(!drag&&!state.selection&&!state.reduced&&!state.active&&state.phase!=='won'){yaw=wrapYaw(yaw+vx*dt*60);pitch=wrapYaw(pitch+vy*dt*60);vx*=Math.exp(-6*dt);vy*=Math.exp(-6*dt);}
